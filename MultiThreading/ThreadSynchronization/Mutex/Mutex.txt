@@ -1,0 +1,116 @@
+﻿Yes 👍 an app **can** have multiple processes — but by default in .NET, when you run a console or web app, it usually starts **one process** (e.g., `MyApp.exe`).
+
+---
+
+## 🔹 Process vs Thread
+
+* **Process** = An independent execution unit. Has its own **memory space**, handles, resources.
+* **Thread** = A lightweight execution unit **inside a process**, sharing the process’s memory.
+
+So:
+
+* One process can have **many threads**.
+* One app can spawn **many processes**.
+
+------------------------------------------------------------------
+
+## 🔹 Example: Multiple Processes in One App
+
+1. **Your app spawns another executable**:
+
+   ```csharp
+   using System.Diagnostics;
+
+   Process.Start("notepad.exe");
+   ```
+
+   * Now your app process + Notepad process are running.
+   * They are **separate processes**, different memory spaces.
+
+2. **Same app can fork itself** (rare in .NET, common in OS-level programming).
+   For example, if you use `Process.Start` to run another instance of your own app:
+
+   ```csharp
+   Process.Start("MyApp.exe");
+   ```
+
+   → You now have two processes of `MyApp`.
+
+---
+
+## 🔹 Synchronization Scope
+
+* **Monitor / lock**: Works only **inside one process** (between threads of that process).
+* **Mutex**: Can work **across processes** (system-wide). That’s why Mutex is useful when you want to prevent **two instances of the same app** from running at the same time.
+
+Example:
+
+```csharp
+var mutex = new Mutex(true, "Global\\MyAppUniqueName", out bool createdNew);
+
+if (!createdNew)
+{
+    Console.WriteLine("Another instance is already running.");
+    return;
+}
+```
+
+* `Global\\` means all sessions/processes in Windows.
+* This ensures only **one process of the app** runs at once.
+
+---
+
+✅ So yes:
+
+* An app can have multiple processes.
+* But inside one process you typically manage **threads**.
+* If you need synchronization **across processes**, use **Mutex** (or OS-level IPC).
+* If it’s only within one process (multiple threads), `Monitor/lock` is enough.
+
+
+
+------------------------------------------------------------------------------------------------------------------------------------
+Yes 👍 you’ve got it — **a Mutex is an operating system (OS) resource**.
+
+Let me break it down:
+
+---
+
+### 🔹 What happens when you create a Mutex?
+
+When you write:
+
+```csharp
+var mutex = new Mutex(false, "Global\\MyAppMutex");
+```
+
+* You’re telling the **OS kernel**:
+  “Please create (or open) a named synchronization object called `Global\MyAppMutex`.”
+
+* The OS keeps track of this Mutex in its **kernel object table**.
+
+* It lives in **kernel space**, not in your process memory.
+
+* Multiple processes can open the same named Mutex because it’s managed by the OS.
+
+---
+
+### 🔹 Key Points
+
+* **Mutex is an OS-managed handle** → your process just holds a reference (handle) to it.
+* If your process crashes while holding the Mutex, the OS knows and automatically releases it.
+* Because it’s an OS resource, a Mutex can be **shared across multiple processes**, unlike `lock` / `Monitor` which are **purely in-process**.
+
+---
+
+### 🔹 Analogy
+
+Think of it like:
+
+* `lock`/`Monitor` → A key kept **inside your house**. Only your family (threads in the same process) can use it.
+* `Mutex` → A key stored in the **city hall** (OS). Any house (process) can request to use it if they know the name.
+
+---
+
+✅ So yes: **Mutex is a synchronization primitive provided by the OS kernel, stored as a kernel object, and accessed via handles in your process.**
+

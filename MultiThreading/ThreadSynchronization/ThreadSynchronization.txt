@@ -1,0 +1,79 @@
+﻿
+### 🔹 Lock vs Synchronization Primitive
+
+* **The lock itself is not a separate object** — it’s the *state of ownership* maintained by a **synchronization primitive**.
+* In C#, you don’t directly have a "lock object" floating around. You use constructs (`Monitor`, `Mutex`, `Semaphore`, etc.) that **implement synchronization**.
+
+Think of it like this:
+
+| Primitive              | What it Provides                                                                         |
+| ---------------------- | ---------------------------------------------------------------------------------------- |
+| `Monitor` (`lock`)     | Exclusive ownership on a reference-type object. (Only one thread can hold it).           |
+| `Mutex`                | Like a Monitor, but can be system-wide (cross-process).                                  |
+| `Semaphore`            | Allows up to N threads inside at once (N > 1). Controls concurrency, not just exclusion. |
+| `ReaderWriterLockSlim` | Allows multiple readers OR one writer. Optimized for read-heavy workloads.               |
+
+---
+
+### 🔹 Example: `lock` / `Monitor`
+
+```csharp
+lock (ticketsLock)
+{
+    // Critical section
+    availableTickets--;
+}
+```
+
+* Here, `ticketsLock` is **just a reference object**.
+* The **real synchronization mechanism** is provided by `Monitor`.
+* `Monitor.Enter(ticketsLock)` → thread takes ownership.
+* `Monitor.Exit(ticketsLock)` → thread releases ownership.
+
+---
+
+### 🔹 Example: Mutex
+
+```csharp
+mutex.WaitOne();
+try
+{
+    // Critical section
+    availableTickets--;
+}
+finally
+{
+    mutex.ReleaseMutex();
+}
+```
+
+* The mutex **holds lock state internally**.
+* You’re just interacting with its API.
+
+---
+
+### 🔹 Example: Semaphore
+
+```csharp
+SemaphoreSlim semaphore = new SemaphoreSlim(3); // allow up to 3 threads
+await semaphore.WaitAsync();
+try
+{
+    // Only 3 threads can be here at the same time
+}
+finally
+{
+    semaphore.Release();
+}
+```
+
+* Semaphore doesn’t “lock” in the exclusive sense.
+* Instead, it **controls how many threads can enter** the section.
+
+---
+
+✅ So yes:
+
+* **Monitor, Mutex, Semaphore, ReaderWriterLock, etc. are synchronization primitives.**
+* They **provide locking or concurrency control**, but the lock itself is just the *ownership state* tracked by these primitives.
+
