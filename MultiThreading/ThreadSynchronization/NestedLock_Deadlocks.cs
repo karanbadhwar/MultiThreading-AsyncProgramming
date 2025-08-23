@@ -17,7 +17,7 @@ namespace MultiThreading.ThreadSynchronization
     {
         private static Object userLock = new object();
         private static Object orderLock = new object();
-        static void Main(string[] args)
+        static void Main_old(string[] args)
         {
             Thread t1 = new Thread(ManageUser);
             t1.Start();
