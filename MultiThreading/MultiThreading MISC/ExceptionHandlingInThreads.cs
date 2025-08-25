@@ -10,7 +10,7 @@ namespace MultiThreading.MultiThreading_MISC
     {
         public static List<Exception> exceptions = [];
         public static Object objLock = new Object();
-        static void Main(string[] args)
+        static void Main_old(string[] args)
         {
             // Each Thread has it own Call Stack, so every Exception do Bubbles up.
             // but we cannot catch the exception in the Calling Thread!!
