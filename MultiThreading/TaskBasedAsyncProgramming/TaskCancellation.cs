@@ -9,7 +9,7 @@ namespace MultiThreading.TaskBasedAsyncProgramming;
 public class TaskCancellation
 {
     
-    static void Main(string[] args)
+    static void Main_old(string[] args)
     {
         using var cts = new CancellationTokenSource();
         var token = cts.Token;
