@@ -8,7 +8,7 @@ namespace MultiThreading.Async_Await;
 
 public class ExceptionHandlingInAsyncAwait
 {
-    static async Task Main(string[] args)
+    static async Task Main_old(string[] args)
     {
         var tasks = new[]
        {

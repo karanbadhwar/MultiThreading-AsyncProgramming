@@ -7,21 +7,21 @@ namespace WinFormsApp1
             InitializeComponent();
         }       
 
-        private void button1_Click(object sender, EventArgs e)
+        private async Task button1_Click(object sender, EventArgs e)
         {
-            Thread thread = new Thread(() => ShowMessage("First message", 3000));
-            thread.Start();
+            //Thread thread = new Thread(() => ShowMessage("First message", 3000));
+            //thread.Start();
+            await ShowMessage("First Message", 3000);
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        private async Task button2_Click(object sender, EventArgs e)
         {
-            Thread thread = new Thread(() => ShowMessage("Second message", 5000));
-            thread.Start();
+            await ShowMessage("Second message", 5000);
         }
 
-        private void ShowMessage(string message, int delay)
+        private async Task ShowMessage(string message, int delay)
         {
-            Thread.Sleep(delay);
+            await Task.Delay(delay);
             LblMessage.Text = message;
         }
     }
