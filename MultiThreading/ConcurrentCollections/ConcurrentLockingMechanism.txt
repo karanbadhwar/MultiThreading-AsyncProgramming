@@ -1,0 +1,31 @@
+﻿`ConcurrentQueue<T>` **does not use a traditional `lock` keyword** like `lock(obj)` internally, but it **is still thread-safe**. Let me clarify how it works:
+
+---
+
+### **How `ConcurrentQueue<T>` Works Internally**
+
+* `ConcurrentQueue<T>` is part of `System.Collections.Concurrent`.
+* It uses a **lock-free algorithm** based on **linked segments and atomic operations**.
+* It relies on **Interlocked operations (Compare-And-Exchange, CAS)** to safely update pointers.
+* This means:
+
+  * Multiple threads can enqueue and dequeue concurrently without blocking each other most of the time.
+  * There is no explicit `lock` (`Monitor.Enter`) that serializes access.
+  * Instead, it uses **spin-waiting** and atomic pointer changes to maintain thread safety.
+
+---
+
+### **Enqueue and Dequeue Safety**
+
+* **Enqueue:** Adds to the tail segment using atomic writes.
+* **Dequeue (TryDequeue):** Removes from the head segment using atomic reads/writes.
+* **Count:** Is only an **approximation**, because while you read it, other threads can be modifying the queue.
+
+---
+
+### **Key Takeaways**
+
+* **No, `Enqueue` does not use a `lock`** in the sense of `lock(obj)`; it uses lock-free concurrency.
+* The thread safety comes from **atomic operations**, not blocking locks.
+* That's why `ConcurrentQueue` is **fast and scalable** for producer-consumer scenarios.
+

@@ -9,7 +9,7 @@ namespace MultiThreading.ParallelLoops;
 public class ThreadLocalStorage
 {
     static int[] arr = Enumerable.Range(0,1000000).ToArray();
-    static void Main(string[] args)
+    static void Main_old(string[] args)
     {
         int sum =0;
         Object lockSum = new Object();
